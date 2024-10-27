@@ -173,7 +173,8 @@ public class SodiumExtraGameOptions {
 
     public static class DetailSettings {
         public boolean sky;
-        public boolean sunMoon;
+        public boolean sun;
+        public boolean moon;
         public boolean stars;
         public boolean rainSnow;
         public boolean biomeColors;
@@ -181,7 +182,8 @@ public class SodiumExtraGameOptions {
 
         public DetailSettings() {
             this.sky = true;
-            this.sunMoon = true;
+            this.sun = true;
+            this.moon = true;
             this.stars = true;
             this.rainSnow = true;
             this.biomeColors = true;
