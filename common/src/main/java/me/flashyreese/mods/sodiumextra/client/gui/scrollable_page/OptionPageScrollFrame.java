@@ -13,6 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,6 @@ public class OptionPageScrollFrame extends AbstractFrame {
 
     public void setupFrame() {
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
         int y = 0;
@@ -57,7 +57,6 @@ public class OptionPageScrollFrame extends AbstractFrame {
         if (this.page == null) return;
 
         this.children.clear();
-        this.renderable.clear();
         this.controlElements.clear();
 
         int y = 0;
@@ -84,7 +83,7 @@ public class OptionPageScrollFrame extends AbstractFrame {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         ControlElement<?> hoveredElement = this.controlElements.stream()
                 .filter(ControlElement::isHovered)
                 .findFirst()
@@ -92,7 +91,7 @@ public class OptionPageScrollFrame extends AbstractFrame {
                         .filter(ControlElement::isFocused)
                         .findFirst()
                         .orElse(null));
-        this.applyScissor(this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height(), () -> super.render(guiGraphics, mouseX, mouseY, delta));
+        this.applyScissor(guiGraphics, this.dim.x(), this.dim.y(), this.dim.width(), this.dim.height(), () -> super.render(guiGraphics, mouseX, mouseY, delta));
         if (this.canScroll) {
             this.scrollBar.render(guiGraphics, mouseX, mouseY, delta);
         }
