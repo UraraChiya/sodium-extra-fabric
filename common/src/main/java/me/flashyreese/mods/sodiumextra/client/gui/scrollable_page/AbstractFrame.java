@@ -1,8 +1,10 @@
 package me.flashyreese.mods.sodiumextra.client.gui.scrollable_page;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.caffeinemc.mods.sodium.client.gui.options.control.ControlElement;
 import net.caffeinemc.mods.sodium.client.gui.widgets.AbstractWidget;
 import net.caffeinemc.mods.sodium.client.util.Dim2i;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -10,7 +12,6 @@ import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 public abstract class AbstractFrame extends AbstractWidget implements ContainerEventHandler {
     protected final Dim2i dim;
     protected final List<AbstractWidget> children = new ArrayList<>();
+    protected final List<Renderable> renderable = new ArrayList<>();
     protected final List<ControlElement<?>> controlElements = new ArrayList<>();
     private GuiEventListener focused;
     private boolean dragging;
@@ -29,26 +31,31 @@ public abstract class AbstractFrame extends AbstractWidget implements ContainerE
 
     public void buildFrame() {
         for (GuiEventListener element : this.children) {
-            if (element instanceof AbstractFrame abstractFrame) {
-                this.controlElements.addAll(abstractFrame.controlElements);
+            if (element instanceof AbstractFrame) {
+                this.controlElements.addAll(((AbstractFrame) element).controlElements);
             }
             if (element instanceof ControlElement<?>) {
                 this.controlElements.add((ControlElement<?>) element);
+            }
+            if (element instanceof Renderable) {
+                this.renderable.add((Renderable) element);
             }
         }
     }
 
     @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        for (Renderable renderable : this.children) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        for (Renderable renderable : this.renderable) {
             renderable.render(guiGraphics, mouseX, mouseY, delta);
         }
     }
 
-    public void applyScissor(@NotNull GuiGraphics guiGraphics, int x, int y, int width, int height, Runnable action) {
-        guiGraphics.enableScissor(x, y, x + width, y + height);
+    public void applyScissor(int x, int y, int width, int height, Runnable action) {
+        double scale = Minecraft.getInstance().getWindow().getGuiScale();
+        RenderSystem.enableScissor((int) (x * scale), (int) (Minecraft.getInstance().getWindow().getHeight() - (y + height) * scale),
+                (int) (width * scale), (int) (height * scale));
         action.run();
-        guiGraphics.disableScissor();
+        RenderSystem.disableScissor();
     }
 
     @Override
